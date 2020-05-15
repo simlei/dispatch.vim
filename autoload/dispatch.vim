@@ -664,7 +664,7 @@ function! dispatch#compiler_options(compiler) abort
       return {'program': 'make', 'format': &errorformat}
     endif
     let &l:makeprg = ''
-    execute 'compiler '.dispatch#fnameescape(a:compiler)
+    execute 'compiler! '.dispatch#fnameescape(a:compiler)
     let options = {'format': &errorformat}
     if !empty(&l:makeprg)
       let options.program = &l:makeprg
@@ -1206,8 +1206,10 @@ function! dispatch#complete(file, ...) abort
     if !a:0
       silent doautocmd ShellCmdPost
     endif
+    echom string(request)
     if !request.background && !get(request, 'aborted')
-      call s:cwindow(request, 0, status, '', 'make')
+      let always_copen = exists('g:dispatch_is_always_copen')
+      call s:cwindow(request, 0, status || always_copen, '', 'make')
       redraw!
     endif
     echo label '!'.request.expanded s:postfix(request)
